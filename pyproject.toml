@@ -1,0 +1,37 @@
+[project]
+name = "yz-people"          # dist name; import package is "yz_people"
+version = "0.0.1"
+description = "People satellite — per-person voice samples + meta for xtts clone, speaker embedding, and wakeword corpus. Standalone HTTP service with JarvYZ-side proxy."
+requires-python = ">=3.10,<3.13"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+    # required for FastAPI's UploadFile / multipart parsing — recording
+    # endpoints take WAV blobs via multipart/form-data.
+    "python-multipart>=0.0.9",
+]
+
+# Intentionally NO [project.scripts] — this satellite has no CLI shim.
+# It's invoked as `python -m yz_people` (daemon) only.
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "httpx>=0.25", "ruff>=0.4"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["yz_people*"]
+
+# Ship the bundled SPA assets so a `pip install yz-people` user
+# gets a working UI at http://127.0.0.1:9003/ — no separate npm build
+# needed at install time. Built by `cd ui && npm run build:pages`
+# BEFORE the wheel build; vite outputs into yz_people/static/.
+[tool.setuptools.package-data]
+yz_people = [
+    "static/*",
+    "static/**/*",
+]
