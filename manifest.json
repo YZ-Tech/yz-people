@@ -10,7 +10,10 @@
   },
   "dashboards": [],
   "exports": [
-    { "id": "PeoplePage", "type": "component" }
+    {
+      "id": "PeoplePage",
+      "type": "component"
+    }
   ],
   "settings": {},
   "service": {
@@ -24,7 +27,15 @@
       "timeoutS": 30
     },
     "events": {
-      "channel": "people"
+      "channels": [
+        "people"
+      ]
     }
+  },
+  "requires": {
+    "network": "none",
+    "sensors": [
+      "mic"
+    ]
   }
 }
