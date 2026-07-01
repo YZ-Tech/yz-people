@@ -1,6 +1,6 @@
 [project]
 name = "yz-people"          # dist name; import package is "yz_people"
-version = "0.0.1"
+version = "0.0.2"
 description = "People satellite — per-person voice samples + meta for xtts clone, speaker embedding, and wakeword corpus. Standalone HTTP service with JarvYZ-side proxy."
 requires-python = ">=3.10,<3.13"
 license = { text = "MIT" }

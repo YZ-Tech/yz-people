@@ -1,7 +1,7 @@
 {
   "id": "people",
   "name": "People",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "enabled": true,
   "nav": {
     "label": "People",
@@ -12,5 +12,19 @@
   "exports": [
     { "id": "PeoplePage", "type": "component" }
   ],
-  "settings": {}
+  "settings": {},
+  "service": {
+    "url": "http://127.0.0.1:9003",
+    "settingPath": "people.satellite_url",
+    "spawnModule": "yz_people",
+    "autoSpawnSettingPath": "people.satellite_auto_spawn",
+    "proxy": {
+      "prefix": "/api/people",
+      "graceS": 10,
+      "timeoutS": 30
+    },
+    "events": {
+      "channel": "people"
+    }
+  }
 }

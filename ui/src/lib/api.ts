@@ -6,14 +6,15 @@
 // scheme.
 //
 // Adapters shipped with the module:
-//   - createSatelliteApi() — wraps the satellite's native routes
-//     (/people, /script, /people/{slug}/recordings/{bucket}, ...).
-//     Used by the standalone SPA. All dynamic slug routes namespaced
-//     under /people/ so StaticFiles can serve /logo.svg etc. at root.
+//   - createSatelliteApi({apiBase}) — wraps the satellite's native routes
+//     (/list, /script, /person/{slug}, /person/{slug}/recordings/{bucket}, ...).
+//     Standalone uses apiBase=''. Dynamic slug routes live under /person/
+//     so StaticFiles can still serve /logo.svg etc. at root.
 //
-// The JarvYZ-embedded adapter lives in `frontend/src/pages/Dev/People/
-// PeoplePage.tsx` and wraps JarvYZ's `/api/people/*` proxy (which forwards
-// to the satellite). Functionally identical; just different URL prefix.
+// The JarvYZ-embedded adapter lives in `frontend/src/pages/People/PeoplePage.tsx`
+// and calls the SAME native paths under JarvYZ's `/api/people` prefix
+// (apiBase='/api/people'), which the generic gateway proxy straight-strips to
+// the satellite. No bespoke remap layer — `/api/people/list` -> `/list`, etc.
 
 import { createContext, useContext } from 'react'
 import type { Bucket, PersonDetail, PersonSummary, SceneScript } from '../types'
@@ -147,13 +148,13 @@ export function createSatelliteApi(
 ): PeopleApi {
   const h = httpClient(apiBase)
   return {
-    list: () => h.request('GET', '/people'),
-    get: (slug) => h.request('GET', `/people/${slug}`),
+    list: () => h.request('GET', '/list'),
+    get: (slug) => h.request('GET', `/person/${slug}`),
     script: () => h.request('GET', '/script'),
 
     create: async (body) => {
       try {
-        const data = await h.request<{ ok: boolean; slug: string }>('POST', '/people', body)
+        const data = await h.request<{ ok: boolean; slug: string }>('POST', '/list', body)
         return { ok: true, slug: data.slug }
       } catch (e) {
         return { ok: false, error: e instanceof Error ? e.message : String(e) }
@@ -164,7 +165,7 @@ export function createSatelliteApi(
       try {
         const data = await h.request<{ ok: boolean; slug: string }>(
           'PUT',
-          `/people/${slug}`,
+          `/person/${slug}`,
           patch,
         )
         return { ok: true, slug: data.slug }
@@ -175,7 +176,7 @@ export function createSatelliteApi(
 
     remove: async (slug) => {
       try {
-        await h.request('DELETE', `/people/${slug}`)
+        await h.request('DELETE', `/person/${slug}`)
         return { ok: true }
       } catch (e) {
         return { ok: false, error: e instanceof Error ? e.message : String(e) }
@@ -187,7 +188,7 @@ export function createSatelliteApi(
         const form = new FormData()
         form.append('file', blob, name)
         const url =
-          `${apiBase}/people/${slug}/recordings/${bucket}` +
+          `${apiBase}/person/${slug}/recordings/${bucket}` +
           `?name=${encodeURIComponent(name)}`
         const r = await fetch(url, { method: 'POST', body: form })
         const data = await r.json()
@@ -202,7 +203,7 @@ export function createSatelliteApi(
       try {
         await h.request(
           'DELETE',
-          `/people/${slug}/recordings/${bucket}/${encodeURIComponent(name)}`,
+          `/person/${slug}/recordings/${bucket}/${encodeURIComponent(name)}`,
         )
         return { ok: true }
       } catch (e) {
@@ -211,7 +212,7 @@ export function createSatelliteApi(
     },
 
     recordingPlaybackUrl: (slug, bucket, name) =>
-      `${apiBase}/people/${slug}/recordings/${bucket}/${encodeURIComponent(name)}`,
+      `${apiBase}/person/${slug}/recordings/${bucket}/${encodeURIComponent(name)}`,
 
     getSettings: () => h.request('GET', '/settings'),
     patchSettings: (patch) => h.request('PATCH', '/settings', patch),

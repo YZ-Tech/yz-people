@@ -302,15 +302,15 @@ def patch_settings(patch: dict = Body(...)) -> dict:
 
 # ─────────────────────── people-collection routes ─────────────────────
 #
-# ALL people-related routes live under /people (or /people/{slug}/...).
-# Reason: the standalone SPA mounts StaticFiles at / for /logo.svg,
-# /favicon.ico, etc. A bare /{slug} route would catch every static-asset
-# request as a slug param before the mount could serve the file (the
-# slug regex rejects the dot in filenames → 400 JSON). Namespacing all
-# dynamic routes under /people/ keeps the asset paths clean.
+# Routes use a flat, gateway-native scheme so JarvYZ's generic proxy can
+# straight-strip /api/people/<path> -> satellite /<path> (no bespoke remap
+# layer). Collection at /list, per-person under /person/{slug}/... . The
+# /person/ literal prefix still protects the standalone SPA: a BARE /{slug}
+# would catch static-asset requests (/logo.svg etc.) as a slug param before
+# StaticFiles (mounted at /) could serve them; /person/{slug} does not.
 
 
-@app.get("/people")
+@app.get("/list")
 def people_list() -> dict:
     """List all enrolled people with their bucket counts."""
     root = _people_dir()
@@ -340,7 +340,7 @@ def people_script() -> dict:
     return SCENE_SCRIPT
 
 
-@app.post("/people")
+@app.post("/list")
 def people_create(body: dict = Body(...)) -> dict:
     """Create a new person. Body: {slug, display_name?, language?,
     can_command?, is_wake_owner?}. Bucket dirs created eagerly."""
@@ -368,7 +368,7 @@ def people_create(body: dict = Body(...)) -> dict:
 # ─────────────────────── per-person routes ────────────────────────────
 
 
-@app.get("/people/{slug}")
+@app.get("/person/{slug}")
 def people_get(slug: str) -> dict:
     _validate_slug(slug)
     meta = _load_meta(slug)
@@ -382,7 +382,7 @@ def people_get(slug: str) -> dict:
     }
 
 
-@app.put("/people/{slug}")
+@app.put("/person/{slug}")
 def people_update(slug: str, body: dict = Body(...)) -> dict:
     """Patch person meta — only the keys present in body are touched."""
     _validate_slug(slug)
@@ -404,7 +404,7 @@ def people_update(slug: str, body: dict = Body(...)) -> dict:
     return {"ok": True, "slug": slug, "meta": meta}
 
 
-@app.delete("/people/{slug}")
+@app.delete("/person/{slug}")
 def people_delete(slug: str) -> dict:
     """Remove a person + all their recordings. Destructive — caller
     confirms via UI."""
@@ -417,7 +417,7 @@ def people_delete(slug: str) -> dict:
     return {"ok": True, "slug": slug}
 
 
-@app.post("/people/{slug}/recordings/{bucket}")
+@app.post("/person/{slug}/recordings/{bucket}")
 async def recording_upload(
     slug: str,
     bucket: str,
@@ -460,7 +460,7 @@ async def recording_upload(
     }
 
 
-@app.delete("/people/{slug}/recordings/{bucket}/{name}")
+@app.delete("/person/{slug}/recordings/{bucket}/{name}")
 def recording_delete(slug: str, bucket: str, name: str) -> dict:
     _validate_slug(slug)
     _validate_bucket(bucket)
@@ -478,7 +478,7 @@ def recording_delete(slug: str, bucket: str, name: str) -> dict:
     return {"ok": True, "deleted": deleted, "name": name}
 
 
-@app.get("/people/{slug}/recordings/{bucket}/{name}")
+@app.get("/person/{slug}/recordings/{bucket}/{name}")
 def recording_download(slug: str, bucket: str, name: str) -> FileResponse:
     """Stream a recording back for playback (review / re-record flow)."""
     _validate_slug(slug)
