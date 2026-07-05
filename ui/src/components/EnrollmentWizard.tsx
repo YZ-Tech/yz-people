@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { CloneVoicePanel } from './CloneVoicePanel'
 import { SceneRecorder } from './SceneRecorder'
 import { BatchRepsRecorder } from './BatchRepsRecorder'
 import { BatchScriptRecorder } from './BatchScriptRecorder'
@@ -130,9 +131,10 @@ export function EnrollmentWizard({
       <Box>
         <Header onClose={onClose} title={`${detail.meta.display_name} — enrollment complete`} />
         <Alert severity="success" sx={{ mb: 2 }}>
-          All scenes recorded. Next: trigger chatterbox voice-clone conditioning + speaker
-          embedding extraction (Phase 4 + clone side-track — wiring lands in a follow-up).
+          All scenes recorded. Speaker-embedding extraction (Phase 4) lands in
+          a follow-up; the voice clone is ready below.
         </Alert>
+        <CloneVoicePanel detail={detail} onChanged={onChanged} />
         <Button variant="contained" onClick={onClose}>
           Back to People
         </Button>

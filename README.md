@@ -34,6 +34,18 @@ Standalone HTTP service for per-person voice samples + meta — substrate
 for the chatterbox voice clone, the eventual speaker embedder, and the
 wakeword-trainer corpus.
 
+**The clone bridge is wired (2026-07-05):** the enrollment wizard's
+completion screen shows a Clone Voice panel — pick one of the person's
+`clone_source` takes, promote it, and the host copies it into its
+voice-reference library as `<DisplayName>.wav` (JarvYZ: core's
+`/api/voice_refs`, the store the chatterbox engine clones from);
+`meta.voice_clone_id` records the link and the People card shows a
+"voice cloned" chip. The capability is host-provided (optional
+`PeopleApi.promoteVoiceClone`) — the standalone SPA has no clone store,
+so it hides the panel. Language mapping stays a deliberate act on the
+host's Mouth page: promoting never silently changes what a language
+sounds like.
+
 A **satellite** in the JarvYZ ecosystem (alongside `satellites/yz-music`
 and `satellites/wakeword-trainer`). Has its own life outside JarvYZ —
 you can run it on its own box, point any number of clients at it

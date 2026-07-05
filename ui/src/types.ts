@@ -19,6 +19,9 @@ export type PersonSummary = {
   language: string
   can_command: boolean
   is_wake_owner: boolean
+  /** Filename of this person's ref in the host's voice-clone library
+   *  (null = not promoted yet). Written by the CloneVoicePanel. */
+  voice_clone_id: string | null
   buckets: Record<Bucket, number>
   enrolled_at: number
 }

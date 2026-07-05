@@ -64,6 +64,9 @@ export function PersonCard({
         {person.can_command && (
           <Chip label="trusted" size="small" color="success" />
         )}
+        {person.voice_clone_id && (
+          <Chip label="voice cloned" size="small" color="secondary" variant="outlined" />
+        )}
       </Stack>
       <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 1 }}>
         <Box sx={{ flex: 1 }}>
@@ -104,7 +107,6 @@ export function PersonCard({
                 }}
               >
                 {got} / {want}
-                {done && ' ✓'}
               </Typography>
             </Box>
           )

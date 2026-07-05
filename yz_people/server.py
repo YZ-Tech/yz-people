@@ -327,6 +327,7 @@ def people_list() -> dict:
                 "language": meta.get("language", "en"),
                 "can_command": bool(meta.get("can_command")),
                 "is_wake_owner": bool(meta.get("is_wake_owner")),
+                "voice_clone_id": meta.get("voice_clone_id"),
                 "buckets": _bucket_counts(d.name),
                 "enrolled_at": meta.get("enrolled_at", 0.0),
             }

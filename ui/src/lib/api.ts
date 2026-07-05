@@ -71,6 +71,19 @@ export interface PeopleApi {
    *  to play back a recording. */
   recordingPlaybackUrl(slug: string, bucket: Bucket, name: string): string
 
+  /** OPTIONAL — hosts with a voice-clone store implement this: copy one
+   *  recording into the host's voice-reference library under `refName`
+   *  (e.g. "Yeon.wav"), returning the stored name. JarvYZ implements it
+   *  against core's /api/voice_refs; the standalone SPA does NOT (no clone
+   *  store exists there), so the clone-voice UI hides itself when absent.
+   *  Overwrites an existing ref of the same name (re-promote semantics). */
+  promoteVoiceClone?(
+    slug: string,
+    bucket: Bucket,
+    name: string,
+    refName: string,
+  ): Promise<{ ok: boolean; ref?: string; error?: string }>
+
   // Satellite settings (data_root, etc.)
   getSettings?(): Promise<SatelliteSettings>
   patchSettings?(patch: Partial<SatelliteSettings>): Promise<SatelliteSettings>
