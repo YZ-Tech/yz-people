@@ -162,7 +162,7 @@ def _bucket_counts(slug: str) -> dict[str, int]:
 SCENE_SCRIPT: dict[str, Any] = {
     "clone_source": {
         "mode": "single_take",
-        "purpose": "xtts voice-clone source — 3 long calm prompts capturing your natural prosody.",
+        "purpose": "chatterbox voice-clone source — 3 long calm prompts capturing your natural prosody.",
         "scenes": [
             {
                 "id": "calm",

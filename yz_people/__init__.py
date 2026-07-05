@@ -4,7 +4,7 @@ Storage layout (created lazily at <data_root>):
     <data_root>/<slug>/
         meta.json          # user-curated (display_name, language, can_command, ...)
         auto_meta.json     # Loom-synthesized facts (Phase 5b)
-        clone_source/      # xtts voice-clone source WAVs (long calm prompts)
+        clone_source/      # chatterbox voice-clone source WAVs (long calm prompts)
         speaker_ref/       # speaker-embedder reference WAVs (short varied)
         wake_positives/    # "Hey Lumenai" reps — only the wake-owner has these
         wake_negatives/    # voice samples that AREN'T the wake phrase

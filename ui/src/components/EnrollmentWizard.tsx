@@ -130,8 +130,8 @@ export function EnrollmentWizard({
       <Box>
         <Header onClose={onClose} title={`${detail.meta.display_name} — enrollment complete`} />
         <Alert severity="success" sx={{ mb: 2 }}>
-          All scenes recorded. Next: trigger xtts voice clone generation + speaker
-          embedding extraction (Phase 4 + xtts side-track — wiring lands in a follow-up).
+          All scenes recorded. Next: trigger chatterbox voice-clone conditioning + speaker
+          embedding extraction (Phase 4 + clone side-track — wiring lands in a follow-up).
         </Alert>
         <Button variant="contained" onClick={onClose}>
           Back to People

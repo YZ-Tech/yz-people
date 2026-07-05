@@ -15,7 +15,7 @@
   <img src="ui/public/logo.svg" alt="JarvYZ" width="200">
 </p>
 
-> `yz-people` — Per-person voice samples + meta. Substrate for the xtts clone, speaker embedder, and wakeword corpus.
+> `yz-people` — Per-person voice samples + meta. Substrate for the chatterbox voice clone, speaker embedder, and wakeword corpus.
 
 ### Techs
 
@@ -31,7 +31,7 @@
 <summary><b>Documentation</b></summary>
 
 Standalone HTTP service for per-person voice samples + meta — substrate
-for the xtts voice clone, the eventual speaker embedder, and the
+for the chatterbox voice clone, the eventual speaker embedder, and the
 wakeword-trainer corpus.
 
 A **satellite** in the JarvYZ ecosystem (alongside `satellites/yz-music`
@@ -84,7 +84,7 @@ Buckets: `clone_source`, `speaker_ref`, `wake_positives`, `wake_negatives`.
 <data_root>/<slug>/
 ├── meta.json            # user-curated (display_name, language, can_command, is_wake_owner, ...)
 ├── auto_meta.json       # Loom-synthesized facts (empty today; LOOM_PLAN tracks)
-├── clone_source/        # WAVs for xtts voice clone training
+├── clone_source/        # WAVs for chatterbox voice cloning
 ├── speaker_ref/         # WAVs for the eventual speaker embedder
 ├── wake_positives/      # WAVs forwarded to wakeword-trainer corpus
 └── wake_negatives/      # WAVs forwarded to wakeword-trainer corpus

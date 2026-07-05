@@ -127,7 +127,7 @@ function PeoplePageInner() {
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Each person enrolls once and contributes to multiple downstream systems:
-        their xtts voice clone, speaker-ID embedding, and (if they own the wake
+        their chatterbox voice clone, speaker-ID embedding, and (if they own the wake
         word) the actual wake training data. Visitor enrollment also adds
         free human-voice negatives to the wake trainer.
       </Typography>
