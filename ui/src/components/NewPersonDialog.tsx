@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControlLabel,
   MenuItem,
   Stack,
@@ -30,6 +31,11 @@ export function NewPersonDialog({
   const [language, setLanguage] = useState('en')
   const [canCommand, setCanCommand] = useState(false)
   const [isWakeOwner, setIsWakeOwner] = useState(noWakeOwnerYet)
+  // Profile subset — same fields as the core owner profile (settings.user).
+  const [location, setLocation] = useState('')
+  const [timezone, setTimezone] = useState('')
+  const [github, setGithub] = useState('')
+  const [about, setAbout] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -49,6 +55,10 @@ export function NewPersonDialog({
       language,
       can_command: canCommand,
       is_wake_owner: isWakeOwner,
+      location: location.trim(),
+      timezone: timezone.trim(),
+      github_username: github.trim(),
+      about: about.trim(),
     })
     setSubmitting(false)
     if (!r.ok) {
@@ -61,6 +71,10 @@ export function NewPersonDialog({
     setLanguage('en')
     setCanCommand(false)
     setIsWakeOwner(noWakeOwnerYet)
+    setLocation('')
+    setTimezone('')
+    setGithub('')
+    setAbout('')
   }
 
   return (
@@ -121,6 +135,46 @@ export function NewPersonDialog({
             positives; everyone else contributes only negatives.
             {!noWakeOwnerYet && !isWakeOwner && ' (already taken)'}
           </Typography>
+
+          <Divider sx={{ my: 0.5 }} />
+          <Typography variant="caption" color="text.secondary">
+            Profile (optional) — the same fields as your own owner profile. Feeds
+            speaker-aware context once JarvYZ knows who is talking.
+          </Typography>
+          <TextField
+            label="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="50678 Köln, Germany"
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Timezone"
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            placeholder="Europe/Berlin"
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="GitHub username"
+            value={github}
+            onChange={(e) => setGithub(e.target.value)}
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="About"
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            placeholder="Free-form notes JarvYZ should know about them."
+            fullWidth
+            size="small"
+            multiline
+            minRows={2}
+          />
+
           {error && (
             <Typography variant="body2" color="error.main">
               {error}

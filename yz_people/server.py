@@ -121,6 +121,22 @@ def _save_meta(slug: str, meta: dict) -> None:
     p.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _demote_other_owners(keep_slug: str) -> None:
+    """Enforce exactly-one is_owner: clear the flag on every person except
+    keep_slug. The owner is a singleton — it mirrors core's single
+    settings.user. Called whenever a person is promoted to owner."""
+    root = _people_dir()
+    if not root.exists():
+        return
+    for d in root.iterdir():
+        if not d.is_dir() or not _SLUG_RE.match(d.name) or d.name == keep_slug:
+            continue
+        meta = _load_meta(d.name)
+        if meta and meta.get("is_owner"):
+            meta["is_owner"] = False
+            _save_meta(d.name, meta)
+
+
 def _load_auto_meta(slug: str) -> dict:
     p = _auto_meta_path(slug)
     if not p.exists():
@@ -327,6 +343,7 @@ def people_list() -> dict:
                 "language": meta.get("language", "en"),
                 "can_command": bool(meta.get("can_command")),
                 "is_wake_owner": bool(meta.get("is_wake_owner")),
+                "is_owner": bool(meta.get("is_owner")),
                 "voice_clone_id": meta.get("voice_clone_id"),
                 "buckets": _bucket_counts(d.name),
                 "enrolled_at": meta.get("enrolled_at", 0.0),
@@ -355,11 +372,24 @@ def people_create(body: dict = Body(...)) -> dict:
         "language": str(body.get("language") or "en"),
         "can_command": bool(body.get("can_command", False)),
         "is_wake_owner": bool(body.get("is_wake_owner", False)),
+        # Owner flag — exactly one person mirrors core's settings.user (the
+        # singleton owner). Managed core-side via the owner card, not here.
+        "is_owner": bool(body.get("is_owner", False)),
+        # Profile subset — the same fields as core's owner profile
+        # (settings.user), so every person carries an identity, not just the
+        # owner. Consumed later by speaker-aware context ("you're talking to
+        # X, who lives in Y"). display_name is the person's name.
+        "location": str(body.get("location") or ""),
+        "timezone": str(body.get("timezone") or ""),
+        "github_username": str(body.get("github_username") or ""),
+        "about": str(body.get("about") or ""),
         "enrolled_at": time.time(),
         "voice_clone_id": None,
         "speaker_embedding_centroid_path": None,
     }
     _save_meta(slug, meta)
+    if meta["is_owner"]:
+        _demote_other_owners(slug)
     for b in BUCKETS:
         _bucket_dir(slug, b).mkdir(parents=True, exist_ok=True)
     observer.emit("created", slug=slug)
@@ -395,12 +425,19 @@ def people_update(slug: str, body: dict = Body(...)) -> dict:
         "language",
         "can_command",
         "is_wake_owner",
+        "is_owner",
+        "location",
+        "timezone",
+        "github_username",
+        "about",
         "voice_clone_id",
         "speaker_embedding_centroid_path",
     ):
         if k in body:
             meta[k] = body[k]
     _save_meta(slug, meta)
+    if body.get("is_owner"):
+        _demote_other_owners(slug)
     observer.emit("updated", slug=slug)
     return {"ok": True, "slug": slug, "meta": meta}
 

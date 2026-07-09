@@ -39,6 +39,10 @@ export interface PeopleState {
     language: string
     can_command: boolean
     is_wake_owner: boolean
+    location: string
+    timezone: string
+    github_username: string
+    about: string
   }>) => Promise<{ ok: boolean; slug?: string; error?: string }>
 
   deletePerson: (slug: string) => Promise<{ ok: boolean; error?: string }>

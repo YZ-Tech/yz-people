@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Box,
@@ -38,6 +38,10 @@ export interface PeoplePageProps {
   api: PeopleApi
   /** Mode flags. */
   capabilities?: Capabilities
+  /** Host deep-link: open a specific person's enrollment (e.g. the owner's
+   *  voice, driven from core's owner card). `n` is a nonce so a repeat
+   *  request for the same slug still re-fires. */
+  focus?: { slug: string; n: number } | null
 }
 
 
@@ -50,7 +54,7 @@ export interface PeoplePageProps {
  *  (JarvYZ-embedded vs standalone vs different hosts), and rebinding
  *  store actions to the right api is cleaner with a fresh store per
  *  mount than a module-level singleton + setter dance. */
-export function PeoplePage({ theme, wsApi, api, capabilities }: PeoplePageProps) {
+export function PeoplePage({ theme, wsApi, api, capabilities, focus }: PeoplePageProps) {
   const caps = capabilities ?? DEFAULT_CAPABILITIES
   const store = useMemo(() => createPeopleStore(api), [api])
 
@@ -61,7 +65,7 @@ export function PeoplePage({ theme, wsApi, api, capabilities }: PeoplePageProps)
       >
         <CapabilitiesContext.Provider value={caps}>
           <StoreProvider value={store}>
-            <PeoplePageInner />
+            <PeoplePageInner focus={focus} />
           </StoreProvider>
         </CapabilitiesContext.Provider>
       </WSContext.Provider>
@@ -72,13 +76,19 @@ export function PeoplePage({ theme, wsApi, api, capabilities }: PeoplePageProps)
 }
 
 
-function PeoplePageInner() {
+function PeoplePageInner({ focus }: { focus?: { slug: string; n: number } | null }) {
   const { people, loading, error, refresh } = usePeopleList()
   const { script } = useSceneScript()
   const [newOpen, setNewOpen] = useState(false)
   const [enrollSlug, setEnrollSlug] = useState<string | null>(null)
   const { detail, loading: detailLoading, refresh: refreshDetail } =
     usePersonDetail(enrollSlug)
+
+  // Host deep-link (core owner card -> "Manage voice"): open the requested
+  // person's enrollment. Keyed on the nonce so re-clicks re-fire.
+  useEffect(() => {
+    if (focus?.slug) setEnrollSlug(focus.slug)
+  }, [focus?.n, focus?.slug])
 
   const noWakeOwnerYet = !people.some((p) => p.is_wake_owner)
 
@@ -171,14 +181,16 @@ function PeoplePageInner() {
         </Box>
       ) : (
         <Stack spacing={1.5}>
-          {people.map((p) => (
-            <PersonCard
-              key={p.slug}
-              person={p}
-              script={script}
-              onClick={() => setEnrollSlug(p.slug)}
-            />
-          ))}
+          {people
+            .filter((p) => !p.is_owner)
+            .map((p) => (
+              <PersonCard
+                key={p.slug}
+                person={p}
+                script={script}
+                onClick={() => setEnrollSlug(p.slug)}
+              />
+            ))}
         </Stack>
       )}
 

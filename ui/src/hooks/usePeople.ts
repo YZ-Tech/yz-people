@@ -111,6 +111,10 @@ export function useCreatePerson() {
       language: string
       can_command: boolean
       is_wake_owner: boolean
+      location: string
+      timezone: string
+      github_username: string
+      about: string
     }>) => api.create(body),
     [api],
   )

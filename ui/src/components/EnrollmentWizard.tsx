@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { CloneVoicePanel } from './CloneVoicePanel'
+import { ProfileEditor } from './ProfileEditor'
 import { SceneRecorder } from './SceneRecorder'
 import { BatchRepsRecorder } from './BatchRepsRecorder'
 import { BatchScriptRecorder } from './BatchScriptRecorder'
@@ -130,6 +131,9 @@ export function EnrollmentWizard({
     return (
       <Box>
         <Header onClose={onClose} title={`${detail.meta.display_name} — enrollment complete`} />
+        {!detail.meta.is_owner && (
+          <ProfileEditor key={detail.slug} detail={detail} onChanged={onChanged} />
+        )}
         <Alert severity="success" sx={{ mb: 2 }}>
           All scenes recorded. Speaker-embedding extraction (Phase 4) lands in
           a follow-up; the voice clone is ready below.
@@ -151,6 +155,9 @@ export function EnrollmentWizard({
         title={detail.meta.display_name}
         chips={[stepLabel(step), `${idx + 1} / ${flow.steps.length}`]}
       />
+      {!detail.meta.is_owner && (
+        <ProfileEditor key={detail.slug} detail={detail} onChanged={onChanged} />
+      )}
       <LinearProgress
         variant="determinate"
         value={((idx + 1) / flow.steps.length) * 100}

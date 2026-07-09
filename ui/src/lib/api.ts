@@ -40,6 +40,10 @@ export interface PeopleApi {
     language: string
     can_command: boolean
     is_wake_owner: boolean
+    location: string
+    timezone: string
+    github_username: string
+    about: string
   }>): Promise<{ ok: boolean; slug?: string; error?: string }>
 
   update(slug: string, patch: Partial<{
@@ -47,6 +51,10 @@ export interface PeopleApi {
     language: string
     can_command: boolean
     is_wake_owner: boolean
+    location: string
+    timezone: string
+    github_username: string
+    about: string
     voice_clone_id: string | null
     speaker_embedding_centroid_path: string | null
   }>): Promise<{ ok: boolean; slug?: string; error?: string }>

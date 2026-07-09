@@ -19,6 +19,9 @@ export type PersonSummary = {
   language: string
   can_command: boolean
   is_wake_owner: boolean
+  /** The singleton owner (mirrors core's settings.user). Rendered as
+   *  person #1 by the host and hidden from this roster to avoid a dup. */
+  is_owner: boolean
   /** Filename of this person's ref in the host's voice-clone library
    *  (null = not promoted yet). Written by the CloneVoicePanel. */
   voice_clone_id: string | null
@@ -32,6 +35,14 @@ export type PersonMeta = {
   language: string
   can_command: boolean
   is_wake_owner: boolean
+  is_owner?: boolean
+  // Profile subset — mirrors core's owner profile (settings.user) so every
+  // person carries an identity, not just the owner. display_name is the
+  // name. Optional: pre-existing meta.json files predate these fields.
+  location?: string
+  timezone?: string
+  github_username?: string
+  about?: string
   enrolled_at: number
   voice_clone_id: string | null
   speaker_embedding_centroid_path: string | null
