@@ -61,8 +61,10 @@ export function PersonCard({
         {person.is_wake_owner && (
           <Chip label="wake owner" size="small" color="primary" />
         )}
+        {/* Muted on purpose: "trusted" is a permission FACT, not an
+            achievement — loud colors stay reserved for anomalies. */}
         {person.can_command && (
-          <Chip label="trusted" size="small" color="success" />
+          <Chip label="trusted" size="small" variant="outlined" />
         )}
         {person.voice_clone_id && (
           <Chip label="voice cloned" size="small" color="secondary" variant="outlined" />
