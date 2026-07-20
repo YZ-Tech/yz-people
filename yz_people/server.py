@@ -583,7 +583,8 @@ def main() -> None:
     import uvicorn
 
     host = os.environ.get("PEOPLE_HOST", "127.0.0.1")
-    port = int(os.environ.get("PEOPLE_PORT", "9003"))
+    # YZ_PORT (core-resolved, settings.ports) wins; PEOPLE_PORT + default for standalone.
+    port = int(os.environ.get("YZ_PORT") or os.environ.get("PEOPLE_PORT") or "9003")
     uvicorn.run(app, host=host, port=port, log_level="info")
 
 
