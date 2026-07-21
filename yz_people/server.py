@@ -41,13 +41,12 @@ from fastapi import (
     File,
     HTTPException,
     UploadFile,
-    WebSocket,
-    WebSocketDisconnect,
 )
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__, observer
+from yz_satellite_common import make_events_router, run_server
 from . import persistent_settings as _persist  # noqa: F401 — load() runs on import
 from .settings import settings
 
@@ -532,24 +531,9 @@ def recording_download(slug: str, bucket: str, name: str) -> FileResponse:
 # ─────────────────────────── events WS ────────────────────────────
 
 
-@app.websocket("/events")
-async def events_ws(ws: WebSocket) -> None:
-    """Server → client push of people events. Initial frame is a
-    `hello` so the client knows the channel is live without waiting
-    for the first mutation."""
-    await ws.accept()
-    q = observer.subscribe()
-    try:
-        await ws.send_json({"event": "people", "kind": "hello"})
-        while True:
-            msg = await q.get()
-            await ws.send_json(msg)
-    except WebSocketDisconnect:
-        pass
-    except Exception:
-        pass
-    finally:
-        observer.unsubscribe(q)
+# The /events WS endpoint (hello frame + queue pump) is the shared router
+# from yz-satellite-common — one body instead of a per-satellite copy.
+app.include_router(make_events_router(observer.broadcaster))
 
 
 # ─────────────────────────── SPA mount ────────────────────────────
@@ -578,14 +562,8 @@ app.mount(
 
 def main() -> None:
     """`python -m yz_people` entry point."""
-    import os
 
-    import uvicorn
-
-    host = os.environ.get("PEOPLE_HOST", "127.0.0.1")
-    # YZ_PORT (core-resolved, settings.ports) wins; PEOPLE_PORT + default for standalone.
-    port = int(os.environ.get("YZ_PORT") or os.environ.get("PEOPLE_PORT") or "9003")
-    uvicorn.run(app, host=host, port=port, log_level="info")
+    run_server(app, 9003, host_env="PEOPLE_HOST", port_env="PEOPLE_PORT")
 
 
 if __name__ == "__main__":
