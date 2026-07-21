@@ -1,7 +1,7 @@
 {
   "id": "people",
   "name": "People",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "enabled": true,
   "nav": {
     "label": "People",
